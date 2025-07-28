@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>{{message}}</h1>
+    <br />
+    <p>{{employee.name}} is {{employee.age}} year old.</p>
+    <p>His salary is {{employee.salary}}.</p>
+    <br />
+
+    <h1>Directives</h1>
+
+    <p v-show="employee.hasCorporatedCard">
+      (v-show) Spending limit for card: {{employee.spendingLimit}}
+    </p>
+
+    <p v-if="employee.hasCorporatedCard">
+      (v-if) Spending limit for card: {{employee.spendingLimit}}
+    </p>
+    <p v-else-if="employee.salary>25000 && employee.yearWithCompany>1">
+      (v-else-if) Employee is eligible for a corporated card
+    </p>
+    <p v-else>
+      (v-else) Employee is not eligible for a corporated card
+    </p>
+
+    <p v-for="(ln,index) in luckyNumbers">{{index + 1}}:- (v-for) Lucky Numbers: {{ln}}</p>
+
+    <h1>v-for with v-once</h1>
+    Lucky Numbers:
+    <p v-for="(ln,index) in luckyNumbers">
+      <span v-once>{{ln}}</span>
+    </p>
+
+    <hr />
+    <h1>Object iteration</h1>
+    <h3>Projects in pipeline</h3>
+    <ul>
+      <li v-for="(project, index) in employee.projects">
+        <span>{{index + 1}} - <u><b>{{project.project}}</b></u> timeline is {{employee.timeline}}</span>
+      </li>
+    </ul>
+
+
+    <hr />
+    <h1>Key v-for</h1>
+    <h3>Projects in pipeline</h3>
+    <ul>
+      <li v-for="(project, index) in employee.projects" :key="project.project">
+        <span>{{index + 1}} - <u><b>{{project.project}}</b></u> timeline is {{project.timeline}}</span>
+        <input type="text" />
+      </li>
+    </ul>
+
+    <hr />
+    {{suffleEmployeeProjectsOrder()}}
+    <h1>key value iteration</h1>
+    <ul>
+      <li v-for="(value,key) in employee">
+        <span>{{key}}: {{value}}</span>
+      </li>
+    </ul>
+
+  </div>
+</body>
+<script>
+
+  const { createApp, ref, reactive, onMounted } = Vue;
+
+  createApp({
+    setup() {
+      const message = "Hello Vue 3!"; //non-reactive
+      const luckyNumbers = [0, 7, 6, 9, 5, 1, 2];
+      const employee = {
+        name: "Pinku",
+        age: 32,
+        salary: 50000,
+        hasCorporatedCard: true,
+        spendingLimit: 10000,
+        yearWithCompany: 0,
+        projects: [
+          { project: "Green A", timeline: "2 years" },
+          { project: "Blue H", timeline: "9 months" },
+          { project: "Pink G", timeline: "3 years" }
+        ]
+      }
+
+      function suffleEmployeeProjectsOrder() {
+        setTimeout(() => {
+          employee.projects.sort(() => Math.random() - 0.5)
+        }, 1000);
+      }
+
+      return {
+        message,
+        employee,
+        luckyNumbers,
+        suffleEmployeeProjectsOrder
+      }
+    }
+  }).mount('#app');
+</script>
+
+</html>

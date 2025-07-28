@@ -1,0 +1,74 @@
+{
+  "destination":[
+    {
+      "id": 1,
+      "name": "Paris",
+      "days": 7,
+      "funFact": "The city of lights, known for its art, fashion, and culture.",
+      "price": 1500
+    },
+    {
+      "id": 2,
+      "name": "Tokyo",
+      "days": 10,
+      "funFact": "A bustling metropolis blending traditional culture with cutting-edge technology.",
+      "price": 2000
+    },
+    {
+      "id": 3,
+      "name": "New York",
+      "days": 5,
+      "funFact": "The city that never sleeps, famous for its skyline and diverse culture.",
+      "price": 1800
+    },
+    {
+      "id": 4,
+      "name": "Sydney",
+      "days": 8,
+      "funFact": "Known for its Sydney Opera House and beautiful beaches.",
+      "price": 2200
+    },
+    {
+      "id": 5,
+      "name": "Cape Town",
+      "days": 6,
+      "funFact": "Famous for its harbor, natural setting, and landmarks like Table Mountain.",
+      "price": 1700
+    },
+    {
+      "id": 6,
+      "name": "Rio de Janeiro",
+      "days": 9,
+      "funFact": "Known for its Copacabana beach and the Christ the Redeemer statue.",
+      "price": 1900
+    },
+    {
+      "id": 7,
+      "name": "Rome",
+      "days": 7,
+      "funFact": "The Eternal City, rich in history and home to the Vatican.",
+      "price": 1600
+    },
+    {
+      "id": 8,
+      "name": "Bangkok",
+      "days": 10,
+      "funFact": "A vibrant city known for its ornate shrines and bustling street life.",
+      "price": 1400
+    },
+    {
+      "id": 9,
+      "name": "Dubai",
+      "days": 5,
+      "funFact": "Famous for luxury shopping, ultramodern architecture, and a lively nightlife.",
+      "price": 2500
+    },
+    {
+      "id": 10,
+      "name": "Istanbul",
+      "days": 6,
+      "funFact": "A city that straddles Europe and Asia across the Bosphorus Strait.",
+      "price": 1300
+    }
+  ]
+}

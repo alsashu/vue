@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>STYLE BINDING (v-bind:style)</h1>
+    <div v-bind:style="{backgroundColor: 'aqua', fontSize: fontSizeTemp}">Hello World!</div>
+    <div v-bind:style="{'color': 'greenyellow', 'fontSize': '40px'}">Learning Vue 3</div>
+    <hr />
+    <h1>CLASS BINDING PART-1 (v-bind:class)</h1>
+
+    <span class="padding-zero font-common" v-bind:class="{h1:true, 'bg-gray':true}">
+      We can add regular html style class and vue bind class as well.
+    </span>
+
+    <h1>CLASS BINDING PART-2 (v-bind:class)</h1>
+
+    <span class="padding-zero font-common" v-bind:class="{h2:isMainTitle(), 'bg-green':hasGreenBackground()}">
+      We can apply functions returning boolean for binding css classes
+    </span>
+    <br />
+    <br />
+    <br />
+    <span class="padding-zero font-common" v-bind:class="isMainTitle() ? mainTitle : anotherMainTitle">
+      Random text
+    </span>
+    <hr />
+    <h1>ARRAY OF CLASSES AND CUSTOM STYLES</h1>
+    <span v-bind:style="someStyle">
+      Random style binding
+    </span>
+    <br />
+    <br />
+    <span v-bind:style="someStyle1.style1">
+      Random style binding
+    </span>
+    <br />
+    <br />
+    <br />
+    <span class="padding-medium" v-bind:class="[isMainTitle() ? mainTitle : '', borderClass]">
+      Random style binding
+    </span>
+    <hr />
+    <h1>V-BIND SHORT NOTATION</h1>
+    <span>STYLES IN VUE</span>
+    <br />
+    <br />
+    <span :class="[isMainTitle() ? mainTitle : '', borderClass]">
+      V-BIND short hand using ":" :class="[isMainTitle() ? mainTitle : '', borderClass]"
+    </span>
+  </div>
+</body>
+<script>
+
+  const { createApp, ref, reactive } = Vue;
+  const fontSizeTemp = '60px';
+
+  const mainTitle = {
+    h3: true,
+    "bg-gray": true
+  }
+
+  const anotherMainTitle = {
+    h4: true,
+    "bg-gray": true
+  }
+
+  const someStyle = {
+    backgroundColor: 'lightblue',
+    fontSize: '20px',
+    margin: '20px',
+    border: "1px solid black"
+  }
+
+  const someStyle1 = {
+    style1: {
+      backgroundColor: 'lightgreen',
+      fontSize: '20px',
+      margin: '20px',
+      border: "1px solid black"
+    }
+  }
+
+  const borderClass = {
+    border: true
+  }
+
+  createApp({
+    setup() {
+      function isMainTitle() {
+        return true;
+      }
+
+      function hasGreenBackground() {
+        return true;
+      }
+      return {
+        fontSizeTemp,
+        isMainTitle,
+        hasGreenBackground,
+        mainTitle,
+        anotherMainTitle,
+        someStyle,
+        someStyle1,
+        borderClass
+      }
+    }
+  }).mount('#app');
+</script>
+<style>
+  .h1 {
+    font-size: 20px;
+    color: green;
+  }
+
+  .h2 {
+    font-size: 40px;
+    color: chocolate;
+  }
+
+  .h3 {
+    font-size: 30px;
+    color: rgb(30, 210, 201);
+  }
+
+  .h4 {
+    font-size: 30px;
+    color: rgb(189, 30, 210);
+  }
+
+  .bg-gray {
+    background-color: gray;
+  }
+
+  .bg-green {
+    background-color: greenyellow;
+  }
+
+  .padding-zero {
+    padding: 0px;
+  }
+
+  .padding-medium {
+    padding: 20px;
+  }
+
+  .font-common {
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  .border {
+    border: 10px solid royalblue;
+  }
+</style>
+
+</html>

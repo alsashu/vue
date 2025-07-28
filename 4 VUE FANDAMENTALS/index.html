@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>BUTTON ON CLICK EVENT</h1>
+    <button v-on:click=" buttonClick()">CLICK ME! (v-on:click)</button>
+    <br />
+    <br />
+    <button v-on:click=" buttonClick('Vue is exciting! I am passing parameter here.')">Passing Parameter!
+      (v-on:click)</button>
+
+    <br />
+    <br />
+    <button v-on:click=" buttonClick('Hello world!','Vue is exciting, I am passing 2 parameter here.')">
+      Passing 2 Parameter! (v-on:click)
+    </button>
+    <hr />
+    <h1>EVENT OBJECT</h1>
+
+    <button v-on:click=" buttonClick('Hello world!','Vue is exciting, I am passing 2 parameter here.', $event)">
+      Passing 2 Parameter with event! (v-on:click)
+    </button>
+    <p>x: {{x}}</p>
+    <p>y: {{y}}</p>
+    <hr />
+
+    <h1>EVENT MODIFIERS</h1>
+
+    <ul>
+      <li v-for="(event,index) in eventModifiers">{{index+1}} - {{event}}</li>
+    </ul>
+
+    <div v-on:click=" buttonClickEventModifier('Div', $event)">
+      <button v-on:click=" buttonClickEventModifier('Button', $event)">
+        Button Clicked! v-on:click)
+      </button>
+      <br />
+      <br />
+      <button v-on:click.stop=" buttonClickEventModifier('Button', $event)">
+        Button Clicked! (v-on:click.stop)
+      </button>
+      <br />
+      <br />
+      <button v-on:click.once=" buttonClickEventModifier('Button', $event)">
+        Button Clicked! (v-on:click.once)
+      </button>
+      <p>x: {{x}}</p>
+      <p>y: {{y}}</p>
+    </div>
+
+    <div>
+      <button v-on:click.once="buttonClickEventModifier('Button', $event)">
+        Button Clicked! (v-on:click.once)
+      </button>
+      <p>x: {{x}}</p>
+      <p>y: {{y}}</p>
+    </div>
+    <div>
+      <a href="https://vuejs.org/" v-on:click.prevent="buttonClickEventModifier('Button', $event)">
+        vue js (v-on:click.prevent)</a>
+      <p>x: {{x}}</p>
+      <p>y: {{y}}</p>
+    </div>
+    <hr />
+
+    <h1>KEY MODIFIERS</h1>
+    <ul>
+      <li v-for="(keymfr,index) in keyModifiers">{{index+1}} - {{keymfr}}</li>
+    </ul>
+    <div>
+      <label>v-on:keyup: </label>
+      <input type="text" v-on:keyup="pressEnter()" />
+    </div>
+    <br />
+    <br />
+    <div>
+      <label>v-on:keyup.enter: </label>
+      <input type="text" v-on:keyup.enter="pressEnter()" />
+    </div>
+    <br />
+    <br />
+    <div>
+      <label>v-on:keyup - passing $event: </label>
+      <input type="text" v-on:keyup="pressEnter($event)" />
+      <!-- <button v-on:click="buttonClickEventModifier('Button', $event)">
+        Button Clicked! Passing Event
+      </button> -->
+
+      <p>Key Press Value: {{keyPressValue}}</p>
+    </div>
+    <hr />
+
+    <h1>SYSTEM KEY MODIFIERS</h1>
+    <ul>
+      <li v-for="(sys,index) in systemModifierKeys">{{index+1}} - {{sys}}</li>
+    </ul>
+
+    <hr />
+
+    <h1>MOUSE BUTTON MODIFIERS</h1>
+    <ul>
+      <li v-for="(mouse,index) in mouseButtonModifiers">{{index+1}} - {{mouse}}</li>
+    </ul>
+
+    <hr />
+  </div>
+</body>
+<script>
+
+  const { createApp, ref, reactive } = Vue;
+  const click = 0;
+
+  createApp({
+    setup() {
+
+      let x = ref(0);
+      let y = ref(0);
+      let eventModifiers = ['.stop', '.prevent', '.self', '.capture', '.once', '.passive'];
+      let keyModifiers = ['.enter', '.tab', '.delete (captures both "Delete" and "Backspace" keys)', '.esc', '.space', '.up', '.down', '.left', '.right'];
+      let systemModifierKeys = ['.ctrl', '.alt', '.shift', '.meta'];
+      let mouseButtonModifiers = ['.left', '.right', '.middle'];
+
+      function pressEnter() {
+        alert("Enter key pressed..")
+      }
+
+      function buttonClick() {
+        alert("button clicked..")
+      }
+
+      function buttonClick(message) {
+        alert(message)
+      }
+
+      function buttonClick(message, newMessage) {
+        alert(message);
+        alert(newMessage);
+      }
+
+      function buttonClick(message, newMessage, event) {
+        x.value = event.x;
+        y.value = event.y;
+        console.log(event);
+        console.log(message);
+        console.log(newMessage);
+      }
+
+      function buttonClickEventModifier(message, event) {
+        x.value = event.x;
+        y.value = event.y;
+        alert(message);
+      }
+
+      return {
+        buttonClick,
+        buttonClickEventModifier,
+        pressEnter,
+        eventModifiers,
+        keyModifiers,
+        systemModifierKeys,
+        mouseButtonModifiers,
+        x,
+        y
+      }
+    }
+  }).mount('#app');
+</script>
+
+</html>

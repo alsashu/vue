@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>TWO WAY DATA BINDING</h1>
+    <label>Name: </label>
+    <input type="text" v-model="name" />
+    <br>
+    <br>
+    <label>Age: </label>
+    <input type="text" v-model="age" />
+    <p>{{name}} is {{age}} year old</p>
+    <hr />
+
+    <h1>MODEL MODIFIERS</h1>
+    <label>Name (v-model.trim): </label>
+    <input type="text" v-model.trim="name" />
+    <br>
+    <br>
+    <label>Age (v-model.lazy): </label>
+    <input type="number" v-model.lazy="age" />
+    <br />
+    <br />
+    <label>Salary (v-model.number: accept only number): </label>
+    <input type="number" v-model.number="salary" />
+    <p>{{name}} is {{age}} year old, his salary is {{salary}} ₹</p>
+    <hr />
+
+    <h1>COMPUTED PROPERTIES</h1>
+    <div>Counter</div>
+
+    <p>{{getFullName()}}</p>
+
+    <p>{{getFullNames}}</p>
+    <button v-on:click="counter++">INCREMENT COUNTER (++)</button>
+    <p>{{counter}}</p>
+    <button v-on:click="counter--">DECREMENT COUNTER (--)</button>
+    <hr />
+
+    <h1>PREVIOUS VALUE OF COMPUTED PROPERTIES</h1>
+
+    <p>Name: {{getPreviousValue}}</p>
+    <p>Previous Value: {{previousValue}}</p>
+    <br />
+    First Name: <input type="text" v-model="firstName" />
+    <hr />
+    <h1>WATCHERS IN VUE</h1>
+    <button v-on:click="counter++">INCREMENT COUNTER (++)</button>
+    <p>{{counter}}</p>
+    <button v-on:click="counter--">DECREMENT COUNTER (--)</button>
+
+    <p>Watch Counter: {{watchCounter}}</p>
+    <hr />
+    <h1>WATCHERS IN REACTIVE PROPERTY</h1>
+    <span>DATA BINDING</span>
+    <br />
+    <br />
+    <button v-on:click="counter++">INCREMENT COUNTER (++)</button>
+    <p>{{counter}}</p>
+    <button v-on:click="counter--">DECREMENT COUNTER (--)</button>
+
+    <p>Watch Counter: {{watchCounter}}</p>
+
+    <br />
+    <br />
+    <p>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</p>
+    <button v-on:click="obj.count++">INCREMENT COUNTER (++)</button>
+    <p>{{obj.count}}</p>
+    <button v-on:click="obj.count--">DECREMENT COUNTER (--)</button>
+
+    <p>Watch Counter: {{watchCounter}}</p>
+  </div>
+</body>
+<script>
+  const { createApp, ref, reactive, computed, watch } = Vue;
+  let name = ref("Ashu");
+  let age = ref(20);
+  let salary = ref(20000);
+  createApp({
+    setup() {
+      let counter = ref(0);
+      let firstName = ref("ASHU");
+      let lastName = ref("JOSHI");
+      let previousValue = ref("");
+      let watchCounter = ref("");
+      let obj = reactive({ count: 0 });
+
+      function getFullName() {
+        // console.log("getFullName() was called but this function is rendering in each click of INCREMENT COUNTER or DECREMENT COUNTER and function is hitting.");
+        return firstName.value + " " + lastName.value;
+      }
+
+      const getFullNames = computed(() => {
+        //console.log("getFullNames() was called only once.");
+        return firstName.value + " " + lastName.value;
+      });
+
+      const getPreviousValue = computed((previous) => {
+        console.log("Previous Value", previous);
+        if (previous == "ASHU JOSHI") {
+          console.log(firstName.value + " " + lastName.value);
+        }
+        previousValue.value = previous;
+        return firstName.value + " " + lastName.value;
+      });
+
+      // watch(() => counter.value, (newValue, oldValue) => {
+      //   console.log("Counter value changed from ", oldValue, " to ", newValue);
+      //   watchCounter.value = "Counter value changed from " + oldValue + " to " + newValue;
+      //   if (newValue == 5) alert("counter value is " + newValue);
+      // })
+
+      watch(counter, (newValue, oldValue) => {
+        console.log("Counter value changed from ", oldValue, " to ", newValue);
+        watchCounter.value = "Counter value changed from " + oldValue + " to " + newValue;
+        if (newValue == 5) alert("counter value is " + newValue);
+      });
+
+      watch(() => obj.count, (newValue, oldValue) => {
+        console.log("Counter value changed from ", oldValue, " to ", newValue);
+        watchCounter.value = "Counter value changed from " + oldValue + " to " + newValue;
+      });
+
+      return {
+        getFullName,
+        getFullNames,
+        getPreviousValue,
+        counter,
+        name,
+        age,
+        salary,
+        firstName,
+        previousValue,
+        watchCounter,
+        obj
+      }
+    }
+  }).mount('#app');
+</script>
+
+</html>

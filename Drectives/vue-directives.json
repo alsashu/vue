@@ -1,0 +1,62 @@
+[
+  {
+    "category": "binding",
+    "directive": "v-bind",
+    "description": "Binds a value to an HTML attribute or component prop (shorthand: ':')"
+  },
+  {
+    "category": "binding",
+    "directive": "v-model",
+    "description": "Creates two-way data binding on form inputs and components"
+  },
+  {
+    "category": "conditional",
+    "directive": "v-if",
+    "description": "Conditionally renders an element based on a true/false condition"
+  },
+  {
+    "category": "conditional",
+    "directive": "v-else-if",
+    "description": "Specifies an 'else if' block for v-if"
+  },
+  {
+    "category": "conditional",
+    "directive": "v-else",
+    "description": "Specifies an 'else' block for v-if"
+  },
+  {
+    "category": "conditional",
+    "directive": "v-show",
+    "description": "Toggle visibility of element using CSS (display: none)"
+  },
+  {
+    "category": "listRendering",
+    "directive": "v-for",
+    "description": "Render a list by iterating over an array or object"
+  },
+  {
+    "category": "eventHandling",
+    "directive": "v-on",
+    "description": "Attach event listeners (shorthand: '@')"
+  },
+  {
+    "category": "templateControl",
+    "directive": "v-slot",
+    "description": "Define named slots in child components (shorthand: '#')"
+  },
+  {
+    "category": "templateControl",
+    "directive": "v-pre",
+    "description": "Skip compilation for this element and all its children"
+  },
+  {
+    "category": "templateControl",
+    "directive": "v-cloak",
+    "description": "Prevent flash of uncompiled content until Vue is ready"
+  },
+  {
+    "category": "templateControl",
+    "directive": "v-once",
+    "description": "Render the element only once and skip future updates"
+  }
+]

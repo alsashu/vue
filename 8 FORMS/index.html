@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+    crossorigin="anonymous"></script>
+
+  <title>MOVIEOPEDIA - FORMS</title>
+
+</head>
+
+<body>
+  <div id="app" class="container">
+    <h1>MOVIEOPEDIA - FORMS</h1>
+    <hr />
+
+    <form v-on:submit.prevent="handleSubmit">
+      <div class="bg-warning p-5 rounded m-5">
+        <div class="h1 text-center">VUE JS - FORMSoPEDIA</div>
+        <hr />
+
+        <div v-if="errorList.length>0" class="alert alert-danger" role="alert">
+          <ul>
+            <li v-for="error in errorList" class="text-danger">{{error}}</li>
+          </ul>
+        </div>
+
+        <!-- <div v-if="!errorList.length" class="alert alert-success" role="alert">
+          <p v-for="error in errorList" class="text-success">Form submitted successfully.</p>
+        </div> -->
+
+        <div class="input-group mt-3">
+          <span class="input-group-text">Email</span>
+          <input type="email" class="form-control" v-model.trim="formObj.email" />
+        </div>
+
+        <div class="input-group mt-3">
+          <span class="input-group-text">Name</span>
+          <input type="text" class="form-control" v-on:blur="validateName()" v-model.trim="formObj.name" />
+        </div>
+
+        <div v-if="!formObj.isNameValid" class="text-danger">Name should be atleast 3 character long</div>
+
+        <div class="input-group mt-3">
+          <span class="input-group-text">Phone</span>
+          <input type="number" class="form-control" v-model.number="formObj.phone" />
+        </div>
+
+        <br />
+
+        <div class="border p-1">
+          <label class="form-label">Gender (using radio button inputs)</label>
+
+          <br />
+
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" v-model="formObj.gender" value="male"
+              name="inlineRadioOptions">Male</input>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" v-model="formObj.gender" value="female"
+              name="inlineRadioOptions">Female</input>
+          </div>
+
+          <br />
+          <hr />
+
+          <label class="form-label">Gender (using dropdown)</label>
+          <select id="gender" class="form-select" v-model="formObj.gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+
+        <div class="input-group mt-3">
+          <input type="checkbox" class="form-check-input" v-model="formObj.subscribe" />
+          <label class="form-check-label"> &nbsp; Subscribe to newsletter</label>
+        </div>
+
+        <div class="text-center pb-3">
+          <button class="btn btn-success m-2 w-50">Submit</button>
+        </div>
+      </div>
+    </form>
+    <div class="border p-3 w-100 mx-auto">
+      <div class="text-center">
+        <h4 class="text-center">Form Properties</h4>
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item">
+          To prevent page loafd on form submit: v-on:submit.prevent
+        </li>
+      </ul>
+    </div>
+    <br />
+    <div class="border p-3 w-100 mx-auto">
+      <div class="text-center">
+        <h4 class="text-center">Model Modifier</h4>
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item">
+          .trim
+        </li>
+        <li class="list-group-item">
+          .number
+        </li>
+      </ul>
+    </div>
+  </div>
+</body>
+<script>
+  const { createApp, ref, reactive, computed, watch } = Vue;
+
+  createApp({
+    setup() {
+      const formObj = reactive({
+        email: "",
+        name: "",
+        phone: "",
+        subscribe: "",
+        gender: "male",
+        isNameValid: true
+      });
+
+      const errorList = reactive([]);
+
+      function handleSubmit() {
+        errorList.length = 0;
+
+        // Name Validation
+        if (!formObj.name || formObj.name.trim() === '') {
+          errorList.push("Name is required.");
+        } else if (!/^[a-zA-Z\s]{2,}$/.test(formObj.name)) {
+          errorList.push("Name must contain only letters and be at least 2 characters long.");
+        } else if (!formObj.name.length > 3) {
+          errorList.push("Name must contain only letters and be at least 3 characters long.");
+        }
+
+        // Email Validation
+        if (!formObj.email || formObj.email.trim() === '') {
+          errorList.push("Email is required.");
+        } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formObj.email)) {
+          errorList.push("Invalid email format.");
+        }
+
+        // Phone Number Validation
+        if (!formObj.phone || formObj.phone === '') {
+          errorList.push("Phone number is required.");
+        } else if (!/^\+?\d{10,15}$/.test(formObj.phone)) {
+          errorList.push("Phone must be 10-15 digits and may start with '+'.");
+        }
+
+        if (!formObj.subscribe) {
+          errorList.push("Please subscribe newsletter");
+        }
+
+        console.log(formObj);
+
+        if (!errorList.length) {
+          alert("Form submitted successfully.");
+        }
+      }
+
+      function validateName() {
+        if (formObj.name.length < 3) {
+          formObj.isNameValid = false
+        } else {
+          formObj.isNameValid = true
+        }
+      }
+
+      return {
+        formObj,
+        handleSubmit,
+        validateName,
+        errorList
+      }
+    }
+  }).mount('#app');
+</script>
+
+</html>

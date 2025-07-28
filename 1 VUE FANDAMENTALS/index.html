@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>{{message}}</h1>
+    <p>Lucky Number: {{luckyNumber}}</p>
+    <p>
+      Lucky number is an {{luckyNumber%2==0?"Even":"Odd"}} number.
+    </p>
+    <p>Lucky Numbers: {{luckyNumbers[2]}}</p>
+    <br />
+    <p>{{employee.name}} is {{employee.age}} year old.</p>
+    <p>his salary is {{employeeRef.salary}}.</p>
+    <p>his salary is {{employeeReactive.salary}}.</p>
+
+    <br />
+    <p>Random Number from 1-10: {{Math.floor(Math.random()*10)+1}}</p>
+    <p>Random Lucky Number from Method (1-10): {{getRandomLuckyNumber()}}</p>
+    <p>A message using function/method: {{getMessage()}}</p>
+    <br />
+
+    <h1>ref</h1>
+    <p>
+      Lucky number is an {{refLuckyNumber}} number.
+    </p>
+
+    <p>
+      {{updateLuckyNumber()}}
+    </p>
+
+    <p>his salary is (using ref) {{employeeRef.salary}}.</p>
+
+    <h1>reactive</h1>
+
+    <p>his salary is (using reactive) {{employeeReactive.salary}}.</p>
+
+    <span>Note: When working with objects we will use "reactive" else we will use "ref" or simple and primitive
+      datatypes</span>
+
+    <h1>Directives</h1>
+
+    <div v-html="getMessageWithHTMLTag()"></div>
+
+    <p v-once>v-once: Render Once Lucky Number: {{refLuckyNumber}}</p>
+
+    <spam>v-bind:href: <a v-bind:href="vue_url">VUE</a></spam>
+
+  </div>
+</body>
+<script>
+
+  const { createApp, ref, reactive } = Vue;
+
+  createApp({
+    setup() {
+      const message = "Hello Vue 3!"; //non-reactive
+      const newMessage = "Hello world!!";
+      const luckyNumber = 6;
+      const luckyNumbers = [0, 7, 6, 9, 5, 1, 2];
+      const employee = {
+        name: "Pinku",
+        age: 32,
+        salary: 50000
+      }
+
+      const employeeRef = ref({
+        name: "Pinku",
+        age: 32,
+        salary: 50000
+      });
+
+      const employeeReactive = reactive({
+        name: "Pinku",
+        age: 32,
+        salary: 50000,
+      });
+
+      const vue_url = "https://vuejs.org/";
+
+      let refLuckyNumber = ref(7);
+
+      function getRandomLuckyNumber() {
+        return Math.floor(Math.random() * 10) + 1;
+      }
+
+      function getMessage() {
+        return newMessage.toUpperCase();
+      }
+
+      function getMessageWithHTMLTag() {
+        return `<p>
+          v-html:
+            <u>
+              ${message}
+            </u>
+          </p>`;
+      }
+
+
+
+      function getRefRandomLuckyNumber() {
+        refLuckyNumber.value = Math.floor(Math.random() * 10) + 1;
+        console.log(refLuckyNumber);
+        return Math.floor(Math.random() * 10) + 1;
+      }
+
+      function updateLuckyNumber() {
+
+        setTimeout(() => {
+          refLuckyNumber.value = 77;
+          employeeRef.value.salary = 60000,
+            employeeReactive.salary = 60000
+        }, 2000);
+        return Math.floor(Math.random() * 10) + 1;
+      }
+
+      return {
+        message,
+        luckyNumber,
+        luckyNumbers,
+        employee,
+        getRandomLuckyNumber,
+        getMessage,
+        refLuckyNumber,
+        updateLuckyNumber,
+        employeeRef,
+        employeeReactive,
+        getMessageWithHTMLTag,
+        vue_url
+      }
+    }
+  }).mount('#app');
+</script>
+
+</html>

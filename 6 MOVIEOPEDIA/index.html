@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+    crossorigin="anonymous"></script>
+
+  <title>MOVIEOPEDIA - BASE SETUP</title>
+
+</head>
+
+<body>
+  <div id="app" class="container">
+    <h1>MOVIEOPEDIA - BASE SETUP</h1>
+    <hr />
+    <div class="bg-info p-5 rounded m-5">
+      <div class="h1 text-center">VUE JS - MOVIEOPEDIA</div>
+      <hr />
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Title</span>
+        <input type="text" class="form-control" v-model="newMovies.title" />
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Years</span>
+        <input type="text" class="form-control" v-model="newMovies.year" />
+      </div>
+
+      <div class="input-group mb-3">
+        <button class="btn btn-success m-2 w-25" v-on:click="addMovie">Add</button>
+        <button class="btn btn-danger m-2 w-25" v-on:click="removeMovie">REMOVE</button>
+      </div>
+
+      <div class="border p-3 w-100 mx-auto">
+        <div class="text-center">
+          <h4 class="text-center">Movie List</h4>
+          <hr />
+        </div>
+        <ul class="list-group">
+          <li v-for="m in movies" class="list-group-item">
+            {{m.title}} - {{m.year}}
+          </li>
+        </ul>
+      </div>
+
+      <div class="border p-3 w-100 mx-auto">
+        <div v-for="m in movies">
+          <div class="card" style="width: 18rem;">
+            <img :src="m.image" class="card-img-top" alt="m.title">
+            <div class="card-body">
+              <h5 class="card-title"> {{m.title}} </h5>
+              <p class="card-text">{{m.description}}</p>
+              <h5>Released: {{m.year}}</h5>
+              <h5>Rating: {{m.rating}}</h5>
+            </div>
+          </div>
+          <br />
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  const { createApp, ref, reactive, computed, watch } = Vue;
+
+  createApp({
+    setup() {
+
+      let movies = reactive([
+        {
+          title: "Raid",
+          year: 2020,
+          image: "https://assets-in.bmscdn.com/discovery-catalog/events/et00382745-gymnptyqla-landscape.jpg",
+          description: "In 1989 Rajasthan, IPS officer Patnaik raids a palace but fails. After requesting a bribe, he's transferred to Bhoj, where he investigates Dada Bhai, a respected local figure. Suspended after a failed raid, he uncovers hidden truths.",
+          rating: 5
+        },
+        {
+          title: "Sinners",
+          year: 2025,
+          image: "https://musesofmedia.ca/wp-content/uploads/2025/04/sinnerss.jpg?w=1024",
+          description: "Sinners is a 2025 American film[a] produced, written, and directed by Ryan Coogler.[10] Set in 1932 in the Mississippi Delta, the film stars Michael B. Jordan in dual roles as criminal twin brothers who return to their hometown to start again where they are confronted by a supernatural evil. The film co-stars Hailee Steinfeld, Miles Caton (in his film debut), Jack O'Connell, Wunmi Mosaku, Jayme Lawson, Omar Miller, and Delroy Lindo.",
+          rating: 7.6
+        },
+        {
+          title: "Edington",
+          year: 2025,
+          image: "https://static.euronews.com/articles/stories/09/37/82/11/1536x864_cmsv2_42ef2e86-7854-5b07-ac96-68671be9adf2-9378211.jpg",
+          description: "Eddington is a 2025 American neo-Western black comedy film written and directed by Ari Aster, and starring Joaquin Phoenix, Pedro Pascal, Luke Grimes, Deirdre O'Connell, Micheal Ward, Austin Butler, and Emma Stone. Set in 2020 during the COVID-19 pandemic in New Mexico, the film examines the political and social turmoil caused by the contested mayoral election fought between Sheriff Joe Cross and Mayor Ted Garcia.[5]",
+          rating: 7.8
+        }]);
+
+      let newMovies = reactive(
+        [{
+          title: "",
+          year: ""
+        }]);
+
+      function addMovie() {
+        console.log(newMovies);
+        if (movies.length < 5) {
+          //newMovies.push({ title: newMovies.title, year: newMovies.year });
+          movies.push({ ...newMovies });
+          newMovies.title = "";
+          newMovies.year = "";
+        }
+      }
+
+      function removeMovie() {
+        console.log();
+        movies.pop();
+      }
+      return {
+        movies,
+        newMovies,
+        addMovie,
+        removeMovie
+      }
+    }
+  }).mount('#app');
+</script>
+
+</html>
