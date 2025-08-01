@@ -6,55 +6,11 @@
     rotation: validComponent.rotation || 0,
     scaleX: validComponent.scale?.x || 1,
     scaleY: validComponent.scale?.y || 1,
-    draggable: true
-  }" @dragstart="handleDragStart" @dragend="handleDragEnd" @click="handleClick" @dblclick="handleDoubleClick">
-    <!-- Track Component -->
-    <template v-if="validComponent.type === 'track'">
-      <v-line :config="{
-        points: getTrackPoints(),
-        stroke: validComponent.color || '#333333',
-        strokeWidth: validComponent.strokeWidth || 4,
-        lineCap: 'round'
-      }" />
-      <!-- Track markers -->
-      <v-circle v-for="(point, index) in getTrackEndPoints()" :key="`marker-${index}`" :config="{
-        x: point.x,
-        y: point.y,
-        radius: 3,
-        fill: validComponent.color || '#333333'
-      }" />
-    </template>
-
-    <!-- Switch Component -->
-    <template v-else-if="validComponent.type === 'switch'">
-      <!-- Main track -->
-      <v-line :config="{
-        points: getSwitchMainPoints(),
-        stroke: validComponent.color || '#666666',
-        strokeWidth: 4,
-        lineCap: 'round'
-      }" />
-      <!-- Branch track -->
-      <v-line :config="{
-        points: getSwitchBranchPoints(),
-        stroke: validComponent.color || '#666666',
-        strokeWidth: 4,
-        lineCap: 'round'
-      }" />
-      <!-- Switch mechanism -->
-      <v-rect :config="{
-        x: -10,
-        y: -5,
-        width: 20,
-        height: 10,
-        fill: validComponent.state === 'normal' ? '#00ff00' : '#ff9900',
-        stroke: '#333',
-        strokeWidth: 1
-      }" />
-    </template>
-
+    draggable: isDraggable
+  }" @dragstart="handleDragStart" @dragend="handleDragEnd" @click="handleClick" @dblclick="handleDoubleClick"
+    @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <!-- Signal Component -->
-    <template v-else-if="validComponent.type === 'signal'">
+    <template v-if="validComponent.type === 'signal'">
       <!-- Signal pole -->
       <v-line :config="{
         points: [0, 0, 0, -40],
@@ -74,8 +30,40 @@
       <v-text :config="{
         x: 10,
         y: -30,
-        text: validComponent.signalNumber || 'S1',
+        text: validComponent.signalNumber || validComponent.name || 'S1',
         fontSize: 10,
+        fill: '#333'
+      }" />
+    </template>
+
+    <!-- Switch Component -->
+    <template v-else-if="validComponent.type === 'switch'">
+      <!-- Switch base -->
+      <v-rect :config="{
+        x: -15,
+        y: -8,
+        width: 30,
+        height: 16,
+        fill: '#666666',
+        stroke: '#333',
+        strokeWidth: 2,
+        cornerRadius: 4
+      }" />
+      <!-- Switch indicator -->
+      <v-circle :config="{
+        x: 0,
+        y: 0,
+        radius: 6,
+        fill: validComponent.state === 'normal' ? '#00ff00' : '#ff9900',
+        stroke: '#333',
+        strokeWidth: 1
+      }" />
+      <!-- Switch label -->
+      <v-text :config="{
+        x: -10,
+        y: 12,
+        text: validComponent.name || 'SW',
+        fontSize: 8,
         fill: '#333'
       }" />
     </template>
@@ -90,14 +78,23 @@
         height: 40,
         fill: validComponent.color || '#0066cc',
         stroke: '#333',
-        strokeWidth: 2
+        strokeWidth: 2,
+        cornerRadius: 4
+      }" />
+      <!-- Station roof -->
+      <v-line :config="{
+        points: [-35, -20, 0, -35, 35, -20],
+        stroke: '#333',
+        strokeWidth: 2,
+        fill: '#8B4513',
+        closed: true
       }" />
       <!-- Station name -->
       <v-text :config="{
         x: -25,
         y: -5,
         text: validComponent.name || 'Station',
-        fontSize: 12,
+        fontSize: 10,
         fill: 'white',
         fontStyle: 'bold'
       }" />
@@ -114,11 +111,35 @@
         stroke: '#333',
         strokeWidth: 1
       }" />
-      <!-- Platform edge -->
+      <!-- Platform edge (safety line) -->
       <v-line :config="{
         points: [-40, -8, 40, -8],
         stroke: '#ffff00',
         strokeWidth: 2
+      }" />
+      <!-- Platform supports -->
+      <v-line :config="{
+        points: [-30, 8, -30, 15],
+        stroke: '#666',
+        strokeWidth: 2
+      }" />
+      <v-line :config="{
+        points: [0, 8, 0, 15],
+        stroke: '#666',
+        strokeWidth: 2
+      }" />
+      <v-line :config="{
+        points: [30, 8, 30, 15],
+        stroke: '#666',
+        strokeWidth: 2
+      }" />
+      <!-- Platform label -->
+      <v-text :config="{
+        x: -15,
+        y: -2,
+        text: validComponent.name || 'Platform',
+        fontSize: 8,
+        fill: '#333'
       }" />
     </template>
 
@@ -131,7 +152,8 @@
         height: 30,
         fill: validComponent.color || '#cccccc',
         stroke: '#333',
-        strokeWidth: 1
+        strokeWidth: 1,
+        cornerRadius: 4
       }" />
       <v-text :config="{
         x: -10,
@@ -154,8 +176,21 @@
       fill: 'transparent'
     }" />
 
-    <!-- Connection Points -->
-    <template v-if="showConnectionPoints">
+    <!-- Hover Indicator -->
+    <v-rect v-if="isHovered && !isSelected" :config="{
+      x: -getBounds().width / 2 - 3,
+      y: -getBounds().height / 2 - 3,
+      width: getBounds().width + 6,
+      height: getBounds().height + 6,
+      stroke: '#17a2b8',
+      strokeWidth: 1,
+      dash: [3, 3],
+      fill: 'transparent',
+      opacity: 0.7
+    }" />
+
+    <!-- Connection Points (when selected) -->
+    <template v-if="isSelected && showConnectionPoints">
       <v-circle v-for="(point, index) in getConnectionPoints()" :key="`connection-${index}`" :config="{
         x: point.x,
         y: point.y,
@@ -165,7 +200,20 @@
         strokeWidth: 1
       }" />
     </template>
+
+    <!-- Snap Indicator (when being placed) -->
+    <v-circle v-if="showSnapIndicator" :config="{
+      x: 0,
+      y: 0,
+      radius: 12,
+      fill: 'transparent',
+      stroke: '#00ff00',
+      strokeWidth: 2,
+      dash: [4, 4],
+      opacity: 0.8
+    }" />
   </v-group>
+
   <!-- Error fallback for invalid components -->
   <v-group v-else :config="{
     id: 'invalid-component',
@@ -194,7 +242,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   component: {
@@ -207,7 +255,7 @@ const props = defineProps({
       }
 
       // Check if we have either type or a valid id that can be used as type
-      const validTypes = ['track', 'switch', 'signal', 'station', 'platform']
+      const validTypes = ['signal', 'switch', 'station', 'platform']
       const hasType = value.type && validTypes.includes(value.type)
       const hasValidId = value.id && validTypes.includes(value.id)
 
@@ -228,10 +276,21 @@ const props = defineProps({
   showConnectionPoints: {
     type: Boolean,
     default: false
+  },
+  isDraggable: {
+    type: Boolean,
+    default: true
+  },
+  showSnapIndicator: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['select', 'update', 'delete', 'connect'])
+
+// Local state
+const isHovered = ref(false)
 
 // Computed properties
 const validComponent = computed(() => {
@@ -245,7 +304,7 @@ const validComponent = computed(() => {
   // If no type but has id that looks like a type, use id as type
   if (!component.type && component.id) {
     // Check if id is a component type
-    const validTypes = ['track', 'switch', 'signal', 'station', 'platform']
+    const validTypes = ['signal', 'switch', 'station', 'platform']
     if (validTypes.includes(component.id)) {
       component.type = component.id
     }
@@ -258,6 +317,7 @@ const validComponent = computed(() => {
 
   return component
 })
+
 const getBounds = () => {
   const component = validComponent.value
   if (!component) {
@@ -265,59 +325,31 @@ const getBounds = () => {
   }
 
   switch (component.type) {
-    case 'track':
-      return { width: 100, height: 10 }
-    case 'switch':
-      return { width: 80, height: 60 }
     case 'signal':
       return { width: 20, height: 50 }
+    case 'switch':
+      return { width: 30, height: 20 }
     case 'station':
-      return { width: 60, height: 40 }
+      return { width: 70, height: 50 }
     case 'platform':
-      return { width: 80, height: 16 }
+      return { width: 80, height: 25 }
     default:
       return { width: 30, height: 30 }
   }
 }
 
-// Track-specific methods
-const getTrackPoints = () => {
-  const component = validComponent.value
-  const length = component?.length || 100
-  return [-length / 2, 0, length / 2, 0]
-}
-
-const getTrackEndPoints = () => {
-  const component = validComponent.value
-  const length = component?.length || 100
-  return [
-    { x: -length / 2, y: 0 },
-    { x: length / 2, y: 0 }
-  ]
-}
-
-// Switch-specific methods
-const getSwitchMainPoints = () => {
-  return [-40, 0, 40, 0]
-}
-
-const getSwitchBranchPoints = () => {
-  const component = validComponent.value
-  const angle = component?.branchAngle || 15
-  const endX = 40 * Math.cos(angle * Math.PI / 180)
-  const endY = -40 * Math.sin(angle * Math.PI / 180)
-  return [0, 0, endX, endY]
-}
-
 // Signal-specific methods
 const getSignalColor = () => {
   const component = validComponent.value
-  const aspect = component?.aspect || 'red'
+  const aspect = component?.aspect || component?.state || 'red'
   const colors = {
     red: '#ff0000',
     yellow: '#ffff00',
     green: '#00ff00',
-    off: '#666666'
+    off: '#666666',
+    danger: '#ff0000',
+    caution: '#ffff00',
+    clear: '#00ff00'
   }
   return colors[aspect] || colors.red
 }
@@ -330,36 +362,31 @@ const getConnectionPoints = () => {
   }
 
   switch (component.type) {
-    case 'track':
-      const trackLength = component.length || 100
-      return [
-        { x: -trackLength / 2, y: 0 },
-        { x: trackLength / 2, y: 0 }
-      ]
-
-    case 'switch':
-      const branchAngle = component.branchAngle || 15
-      const branchEndX = 40 * Math.cos(branchAngle * Math.PI / 180)
-      const branchEndY = -40 * Math.sin(branchAngle * Math.PI / 180)
-      return [
-        { x: -40, y: 0 }, // Main entry
-        { x: 40, y: 0 },  // Main exit
-        { x: branchEndX, y: branchEndY } // Branch exit
-      ]
-
     case 'signal':
       return [{ x: 0, y: 0 }] // Base connection point
+
+    case 'switch':
+      return [
+        { x: -15, y: 0 }, // Left connection
+        { x: 15, y: 0 },  // Right connection
+        { x: 0, y: -8 },  // Top connection
+        { x: 0, y: 8 }    // Bottom connection
+      ]
 
     case 'station':
       return [
         { x: -30, y: 0 },
-        { x: 30, y: 0 }
+        { x: 30, y: 0 },
+        { x: 0, y: -20 },
+        { x: 0, y: 20 }
       ]
 
     case 'platform':
       return [
         { x: -40, y: 0 },
-        { x: 40, y: 0 }
+        { x: 40, y: 0 },
+        { x: 0, y: -8 },
+        { x: 0, y: 8 }
       ]
 
     default:
@@ -381,16 +408,25 @@ const handleDoubleClick = (e) => {
   const component = validComponent.value
   if (!component) return
 
-  // Open properties dialog or toggle state
+  // Toggle component states on double-click
   if (component.type === 'switch') {
     const newState = component.state === 'normal' ? 'reverse' : 'normal'
     emit('update', component.id, { state: newState })
   } else if (component.type === 'signal') {
     const aspects = ['red', 'yellow', 'green', 'off']
-    const currentIndex = aspects.indexOf(component.aspect || 'red')
+    const currentAspect = component.aspect || component.state || 'red'
+    const currentIndex = aspects.indexOf(currentAspect)
     const nextAspect = aspects[(currentIndex + 1) % aspects.length]
-    emit('update', component.id, { aspect: nextAspect })
+    emit('update', component.id, { aspect: nextAspect, state: nextAspect })
   }
+}
+
+const handleMouseEnter = () => {
+  isHovered.value = true
+}
+
+const handleMouseLeave = () => {
+  isHovered.value = false
 }
 
 const handleDragStart = (e) => {
@@ -429,7 +465,9 @@ const handleDragEnd = (e) => {
     node.position(newPosition)
   }
 
-  // Emit update
+  // Check for track snapping
+  // This would need to be implemented with access to the track store
+  // For now, just emit the update
   emit('update', component.id, { position: newPosition })
 }
 </script>

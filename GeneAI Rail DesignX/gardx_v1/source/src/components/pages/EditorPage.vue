@@ -523,7 +523,7 @@ onMounted(() => {
   // Create default project if none exists
   if (!designStore.currentProject) {
     designStore.createProject({
-      name: 'GARD-X',
+      name: 'Editor',
       description: 'A new railway infrastructure design',
       type: 'suburban'
     })

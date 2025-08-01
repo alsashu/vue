@@ -1,19 +1,19 @@
 <template>
-  <v-group v-if="validComponent" :config="{
-    id: validComponent.id,
-    x: validComponent.position?.x || 0,
-    y: validComponent.position?.y || 0,
-    rotation: validComponent.rotation || 0,
-    scaleX: validComponent.scale?.x || 1,
-    scaleY: validComponent.scale?.y || 1,
+  <v-group v-if="component && component.type" :config="{
+    id: component.id,
+    x: component.position?.x || 0,
+    y: component.position?.y || 0,
+    rotation: component.rotation || 0,
+    scaleX: component.scale?.x || 1,
+    scaleY: component.scale?.y || 1,
     draggable: true
   }" @dragstart="handleDragStart" @dragend="handleDragEnd" @click="handleClick" @dblclick="handleDoubleClick">
     <!-- Track Component -->
-    <template v-if="validComponent.type === 'track'">
+    <template v-if="component.type === 'track'">
       <v-line :config="{
         points: getTrackPoints(),
-        stroke: validComponent.color || '#333333',
-        strokeWidth: validComponent.strokeWidth || 4,
+        stroke: component.color || '#333333',
+        strokeWidth: component.strokeWidth || 4,
         lineCap: 'round'
       }" />
       <!-- Track markers -->
@@ -21,23 +21,23 @@
         x: point.x,
         y: point.y,
         radius: 3,
-        fill: validComponent.color || '#333333'
+        fill: component.color || '#333333'
       }" />
     </template>
 
     <!-- Switch Component -->
-    <template v-else-if="validComponent.type === 'switch'">
+    <template v-else-if="component.type === 'switch'">
       <!-- Main track -->
       <v-line :config="{
         points: getSwitchMainPoints(),
-        stroke: validComponent.color || '#666666',
+        stroke: component.color || '#666666',
         strokeWidth: 4,
         lineCap: 'round'
       }" />
       <!-- Branch track -->
       <v-line :config="{
         points: getSwitchBranchPoints(),
-        stroke: validComponent.color || '#666666',
+        stroke: component.color || '#666666',
         strokeWidth: 4,
         lineCap: 'round'
       }" />
@@ -47,14 +47,14 @@
         y: -5,
         width: 20,
         height: 10,
-        fill: validComponent.state === 'normal' ? '#00ff00' : '#ff9900',
+        fill: component.state === 'normal' ? '#00ff00' : '#ff9900',
         stroke: '#333',
         strokeWidth: 1
       }" />
     </template>
 
     <!-- Signal Component -->
-    <template v-else-if="validComponent.type === 'signal'">
+    <template v-else-if="component.type === 'signal'">
       <!-- Signal pole -->
       <v-line :config="{
         points: [0, 0, 0, -40],
@@ -74,21 +74,21 @@
       <v-text :config="{
         x: 10,
         y: -30,
-        text: validComponent.signalNumber || 'S1',
+        text: component.signalNumber || 'S1',
         fontSize: 10,
         fill: '#333'
       }" />
     </template>
 
     <!-- Station Component -->
-    <template v-else-if="validComponent.type === 'station'">
+    <template v-else-if="component.type === 'station'">
       <!-- Station building -->
       <v-rect :config="{
         x: -30,
         y: -20,
         width: 60,
         height: 40,
-        fill: validComponent.color || '#0066cc',
+        fill: component.color || '#0066cc',
         stroke: '#333',
         strokeWidth: 2
       }" />
@@ -96,7 +96,7 @@
       <v-text :config="{
         x: -25,
         y: -5,
-        text: validComponent.name || 'Station',
+        text: component.name || 'Station',
         fontSize: 12,
         fill: 'white',
         fontStyle: 'bold'
@@ -104,13 +104,13 @@
     </template>
 
     <!-- Platform Component -->
-    <template v-else-if="validComponent.type === 'platform'">
+    <template v-else-if="component.type === 'platform'">
       <v-rect :config="{
         x: -40,
         y: -8,
         width: 80,
         height: 16,
-        fill: validComponent.color || '#999999',
+        fill: component.color || '#999999',
         stroke: '#333',
         strokeWidth: 1
       }" />
@@ -129,14 +129,14 @@
         y: -15,
         width: 30,
         height: 30,
-        fill: validComponent.color || '#cccccc',
+        fill: component.color || '#cccccc',
         stroke: '#333',
         strokeWidth: 1
       }" />
       <v-text :config="{
         x: -10,
         y: -3,
-        text: validComponent.type ? validComponent.type.charAt(0).toUpperCase() : '?',
+        text: component.type ? component.type.charAt(0).toUpperCase() : '?',
         fontSize: 14,
         fill: '#333'
       }" />
@@ -166,31 +166,6 @@
       }" />
     </template>
   </v-group>
-  <!-- Error fallback for invalid components -->
-  <v-group v-else :config="{
-    id: 'invalid-component',
-    x: 0,
-    y: 0,
-    draggable: false
-  }">
-    <v-rect :config="{
-      x: -20,
-      y: -20,
-      width: 40,
-      height: 40,
-      fill: '#ff0000',
-      stroke: '#333',
-      strokeWidth: 2
-    }" />
-    <v-text :config="{
-      x: -5,
-      y: -3,
-      text: '!',
-      fontSize: 16,
-      fill: 'white',
-      fontStyle: 'bold'
-    }" />
-  </v-group>
 </template>
 
 <script setup>
@@ -201,24 +176,7 @@ const props = defineProps({
     type: Object,
     required: true,
     validator: (value) => {
-      if (!value || typeof value !== 'object') {
-        console.error('RailComponent: component prop must be an object, received:', value)
-        return false
-      }
-
-      // Check if we have either type or a valid id that can be used as type
-      const validTypes = ['track', 'switch', 'signal', 'station', 'platform']
-      const hasType = value.type && validTypes.includes(value.type)
-      const hasValidId = value.id && validTypes.includes(value.id)
-
-      if (!hasType && !hasValidId) {
-        console.error('RailComponent: component must have a valid type property or id property matching component types:', value)
-        console.error('Valid types:', validTypes)
-        console.error('Received component keys:', Object.keys(value))
-        return false
-      }
-
-      return true
+      return value && typeof value === 'object' && value.type
     }
   },
   isSelected: {
@@ -234,37 +192,12 @@ const props = defineProps({
 const emit = defineEmits(['select', 'update', 'delete', 'connect'])
 
 // Computed properties
-const validComponent = computed(() => {
-  if (!props.component || typeof props.component !== 'object') {
-    return null
-  }
-
-  // Create a normalized component object
-  const component = { ...props.component }
-
-  // If no type but has id that looks like a type, use id as type
-  if (!component.type && component.id) {
-    // Check if id is a component type
-    const validTypes = ['track', 'switch', 'signal', 'station', 'platform']
-    if (validTypes.includes(component.id)) {
-      component.type = component.id
-    }
-  }
-
-  // Still no type? Return null
-  if (!component.type) {
-    return null
-  }
-
-  return component
-})
 const getBounds = () => {
-  const component = validComponent.value
-  if (!component) {
-    return { width: 40, height: 40 }
+  if (!props.component || !props.component.type) {
+    return { width: 30, height: 30 }
   }
 
-  switch (component.type) {
+  switch (props.component.type) {
     case 'track':
       return { width: 100, height: 10 }
     case 'switch':
@@ -282,14 +215,12 @@ const getBounds = () => {
 
 // Track-specific methods
 const getTrackPoints = () => {
-  const component = validComponent.value
-  const length = component?.length || 100
+  const length = props.component?.length || 100
   return [-length / 2, 0, length / 2, 0]
 }
 
 const getTrackEndPoints = () => {
-  const component = validComponent.value
-  const length = component?.length || 100
+  const length = props.component?.length || 100
   return [
     { x: -length / 2, y: 0 },
     { x: length / 2, y: 0 }
@@ -302,8 +233,7 @@ const getSwitchMainPoints = () => {
 }
 
 const getSwitchBranchPoints = () => {
-  const component = validComponent.value
-  const angle = component?.branchAngle || 15
+  const angle = props.component?.branchAngle || 15
   const endX = 40 * Math.cos(angle * Math.PI / 180)
   const endY = -40 * Math.sin(angle * Math.PI / 180)
   return [0, 0, endX, endY]
@@ -311,8 +241,7 @@ const getSwitchBranchPoints = () => {
 
 // Signal-specific methods
 const getSignalColor = () => {
-  const component = validComponent.value
-  const aspect = component?.aspect || 'red'
+  const aspect = props.component?.aspect || 'red'
   const colors = {
     red: '#ff0000',
     yellow: '#ffff00',
@@ -324,21 +253,20 @@ const getSignalColor = () => {
 
 // Connection points for different component types
 const getConnectionPoints = () => {
-  const component = validComponent.value
-  if (!component) {
+  if (!props.component || !props.component.type) {
     return [{ x: 0, y: 0 }]
   }
 
-  switch (component.type) {
+  switch (props.component.type) {
     case 'track':
-      const trackLength = component.length || 100
+      const trackLength = props.component.length || 100
       return [
         { x: -trackLength / 2, y: 0 },
         { x: trackLength / 2, y: 0 }
       ]
 
     case 'switch':
-      const branchAngle = component.branchAngle || 15
+      const branchAngle = props.component.branchAngle || 15
       const branchEndX = 40 * Math.cos(branchAngle * Math.PI / 180)
       const branchEndY = -40 * Math.sin(branchAngle * Math.PI / 180)
       return [
@@ -370,46 +298,40 @@ const getConnectionPoints = () => {
 // Event handlers
 const handleClick = (e) => {
   e.cancelBubble = true
-  const component = validComponent.value
-  if (component) {
-    emit('select', component)
+  if (props.component) {
+    emit('select', props.component)
   }
 }
 
 const handleDoubleClick = (e) => {
   e.cancelBubble = true
-  const component = validComponent.value
-  if (!component) return
+  if (!props.component) return
 
   // Open properties dialog or toggle state
-  if (component.type === 'switch') {
-    const newState = component.state === 'normal' ? 'reverse' : 'normal'
-    emit('update', component.id, { state: newState })
-  } else if (component.type === 'signal') {
+  if (props.component.type === 'switch') {
+    const newState = props.component.state === 'normal' ? 'reverse' : 'normal'
+    emit('update', props.component.id, { state: newState })
+  } else if (props.component.type === 'signal') {
     const aspects = ['red', 'yellow', 'green', 'off']
-    const currentIndex = aspects.indexOf(component.aspect || 'red')
+    const currentIndex = aspects.indexOf(props.component.aspect || 'red')
     const nextAspect = aspects[(currentIndex + 1) % aspects.length]
-    emit('update', component.id, { aspect: nextAspect })
+    emit('update', props.component.id, { aspect: nextAspect })
   }
 }
 
 const handleDragStart = (e) => {
-  const component = validComponent.value
-  if (!component) return
-
   // Store initial position for snapping
   const stage = e.target.getStage()
-  if (stage && component.position) {
+  if (stage && props.component?.position) {
     stage.dragStartPosition = {
-      x: component.position.x,
-      y: component.position.y
+      x: props.component.position.x,
+      y: props.component.position.y
     }
   }
 }
 
 const handleDragEnd = (e) => {
-  const component = validComponent.value
-  if (!component) return
+  if (!props.component) return
 
   const stage = e.target.getStage()
   const node = e.target
@@ -430,6 +352,6 @@ const handleDragEnd = (e) => {
   }
 
   // Emit update
-  emit('update', component.id, { position: newPosition })
+  emit('update', props.component.id, { position: newPosition })
 }
 </script>
